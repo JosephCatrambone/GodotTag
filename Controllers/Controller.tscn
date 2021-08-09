@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Controllers/Controller.cs" type="Script" id=1]
+
+[node name="Controller" type="Camera"]
+script = ExtResource( 1 )

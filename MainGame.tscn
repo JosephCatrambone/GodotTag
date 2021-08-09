@@ -1,0 +1,53 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://MainGame.cs" type="Script" id=1]
+[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://DebugCamera.cs" type="Script" id=3]
+[ext_resource path="res://Levels/TexturePacks/78 Hand Painted Textures by Deer Lover/Dirt_grass100%_009.png" type="Texture" id=4]
+[ext_resource path="res://Levels/TexturePacks/78 Hand Painted Textures by Deer Lover/Copper-Bricks.png" type="Texture" id=5]
+[ext_resource path="res://Player/Bot.tscn" type="PackedScene" id=6]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_texture = ExtResource( 4 )
+uv1_scale = Vector3( 0.5, 0.5, 0.5 )
+uv1_triplanar = true
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_texture = ExtResource( 5 )
+uv1_scale = Vector3( 0.5, 0.5, 0.5 )
+uv1_triplanar = true
+
+[node name="MainGame" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="Level" type="Spatial" parent="."]
+
+[node name="Level" type="CSGCombiner" parent="Level"]
+use_collision = true
+
+[node name="Ground1" type="CSGPolygon" parent="Level/Level"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -1, 0 )
+polygon = PoolVector2Array( 0.0369306, -31.9891, -31.9311, -32.1021, -32.157, -23.9689, -16.2295, -23.8559, -15.5517, -7.81539, -48.3105, -8.04132, -48.1975, 16.2454, 40.0252, 16.1324, 39.9123, 7.77327, 15.5126, 7.77327, 16.3034, -0.359947, 50.5306, -0.134021, 49.9658, -33.3446, 72.0461, -32.3644, 72.272, -48.066, 32.2837, -48.066, 31.7189, -31.7995, 16.0172, -31.7995, 15.799, -64.2938, -0.128525, -64.4067 )
+material = SubResource( 1 )
+
+[node name="Walls1" type="CSGPolygon" parent="Level/Level"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
+polygon = PoolVector2Array( 19.8061, -63.3993, 2.46212, -61.6934, 2.88029, -30.3309, -29.5277, -30.3309, -29.5277, -26.1492, -14.4736, -26.1492, -13.0101, -6.28626, -46.0453, -5.44992, -46.6725, 13.7858, 37.17, 13.9948, 36.9609, 9.6041, 13.5436, 9.18593, 13.5436, -2.31367, 47.8333, -2.73184, 47.6242, -35.3489, 69.5779, -34.7216, 70.2052, -46.2212, 33.6156, -47.0575, 32.5702, -30.749, 13.3345, -31.3763, 13.9928, -61.9975, 18.2285, -62.652, 17.5161, -34.3035, 29.4339, -34.0944, 30.0611, -51.6574, 74.5959, -49.9847, 73.9687, -29.0764, 52.0149, -29.9127, 52.224, 1.868, 42.188, 2.49525, 41.7698, 18.5947, -50.2269, 19.6401, -50.436, -10.8861, -18.4462, -10.4679, -18.4462, -21.9675, -35.1729, -22.3857, -34.3366, -35.558, -1.51047, -33.4671, -2.86111, -66.4714, 20.0552, -67.3847 )
+depth = 3.0
+material = SubResource( 2 )
+
+[node name="Player1" parent="." groups=[
+"tagged",
+"taggers",
+] instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
+
+[node name="DebugCamera" type="Camera" parent="."]
+transform = Transform( -0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, -12, 8, -13 )
+script = ExtResource( 3 )
+
+[node name="Bot" parent="." instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, -17 )
+
+[node name="Bot2" parent="." instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -28 )
