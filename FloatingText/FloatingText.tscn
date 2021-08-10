@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://FloatingText/floating_text.gd" type="Script" id=1]
+
+[node name="FloatingText" type="Control"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = -200.0
+margin_top = -40.0
+margin_right = 200.0
+margin_bottom = -17.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 0.501961 )
+custom_constants/shadow_offset_x = 1
+custom_constants/shadow_offset_y = 1
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}

@@ -5,13 +5,18 @@ using System.Diagnostics;
 
 public class MainGame : Spatial
 {
-	[Export] public string PlayerResourcePath = "res://Player/Player.tscn"; 
-	private List<Godot.Collections.Dictionary> players = new List<Godot.Collections.Dictionary>();
+	private const int SERVER_PORT = 42069;
+	private const int MAX_PLAYERS = 16;
+	
+	[Export] public string PlayerResourcePath = "res://Player/Player.tscn";
+	private PackedScene playerPackedScene;
+	private IDictionary<int, Godot.Collections.Dictionary> players = new Dictionary<int, Godot.Collections.Dictionary>();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		Input.SetMouseMode(Input.MouseMode.Captured);
+		playerPackedScene = ResourceLoader.Load<PackedScene>(PlayerResourcePath);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -29,11 +34,11 @@ public class MainGame : Spatial
 		{
 			if (Input.IsKeyPressed((int) KeyList.F5))
 			{
-				CreateOrJoinServer("", 42069, 16);
+				CreateOrJoinServer("", SERVER_PORT, MAX_PLAYERS);
 			}
 			else
 			{
-				CreateOrJoinServer("127.0.0.1", 42069, 0);
+				CreateOrJoinServer("127.0.0.1", SERVER_PORT, 0);
 			}
 		}
 	}
@@ -81,7 +86,10 @@ public class MainGame : Spatial
 	{
 		if (GetTree().IsNetworkServer())
 		{
+			NetworkedMultiplayerPeer net = GetTree().NetworkPeer;
 			// Broadcast a disconnect before we terminate everything.
+			//foreach (var player in players) {}
+			//net.SetTargetPeer();  // Default broadcast.
 		}
 
 		GetTree().NetworkPeer = null; // Disconnects all.
@@ -101,7 +109,7 @@ public class MainGame : Spatial
 		myInfo["id"] = id;
 		myInfo["ready"] = false;
 		GD.Print("Player '" + myInfo["player_name"] + "' joined the server.");
-		RpcId(id, nameof(RegisterPlayer), new object[] { myInfo });
+		RpcId(id, nameof(RegisterAndSpawnPlayer), new object[] { myInfo });
 	}
 
 	public void OnClientConnectionSuccess()
@@ -112,7 +120,8 @@ public class MainGame : Spatial
 		myInfo["player_name"] = "Player " + GetTree().GetNetworkUniqueId();
 		myInfo["id"] = GetTree().GetNetworkUniqueId();
 		myInfo["ready"] = false;
-		RpcId(1, nameof(RegisterPlayer), new object[] { myInfo });
+		// Notify the server that we have connected.
+		RpcId(1, nameof(RegisterAndSpawnPlayer), new object[] { myInfo });
 	}
 
 	public void OnClientConnectionFailure()
@@ -128,34 +137,44 @@ public class MainGame : Spatial
 	// The remote keyword means that the rpc() call will go via network and execute remotely.
 	// The remotesync keyword means that the rpc() call will go via network and execute remotely, but will also execute locally (do a normal function call).
 	[Remote]
-	public void RegisterPlayer(Godot.Collections.Dictionary info)
+	public void RegisterAndSpawnPlayer(Godot.Collections.Dictionary info)
 	{
-		/*
-		(Server Host) Player Connected Callback.  ID: 241530385
-		Player 'Player 1' joined the server.
-		Client says that its rpc ID is 241530385
-		Client info says that its ID is 1
-		Client says that its rpc ID is 241530385
-		Client info says that its ID is 241530385
-		 */
-		int rpcID = GetTree().GetRpcSenderId();
-		GD.Print("Client says that its rpc ID is " + rpcID);
-		GD.Print("Client info says that its ID is " + info["id"]);
-		//Debug.Assert((int)info["id"] == rpcID);
-		players.Add(info);
+		int senderID = GetTree().GetRpcSenderId();
+		//int networkID = GetTree().GetNetworkUniqueId(); // Local, not the sender.
+		
+		if (GetTree().IsNetworkServer())
+		{
+			// As the network host, I need to send all the players to this newly joined person.
+			foreach (var player in players)
+			{
+				RpcId(senderID, nameof(RegisterAndSpawnPlayer), player.Value);
+			}
+		}
+		
+		// I am not the server and have been notified about the arrival of a new person.
+		//GD.Print("Client says that its rpc ID is " + rpcID);
+		//GD.Print("Client info says that its ID is " + info["id"]);
+		//GD.Print("Client says that its network ID is " + networkID);
+		players[senderID] = info; // RPC ID or Network ID?
+
+		Spatial newPlayer = playerPackedScene.Instance<Spatial>();
+		newPlayer.Name = "Player " + info["player_name"] + " | " + senderID;
+		newPlayer.SetNetworkMaster(senderID);
+		newPlayer.GetNode("PlayerNameDisplayOffset/FloatingText").Call("set_text", newPlayer.Name);
+		GetTree().Root.GetNode("MainGame/Level").AddChild(newPlayer);
 	}
 
 	[Remote]
 	public void StartGame()
 	{
 		GetTree().RefuseNewNetworkConnections = true; // Don't let people join late.
-		int selfID = GetTree().GetNetworkUniqueId();
+		int selfID = GetTree().GetNetworkUniqueId(); // This should be 1 for the server.
 		GetTree().Paused = true;
 
 		// Do loading and all that stuff here.
 		// Load level, etc.
 		//ResourceLoader.Load(PlayerResourcePath4)
-		Resource playerResource = GD.Load(PlayerResourcePath);
+		
 		
 	}
 }
