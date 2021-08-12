@@ -1,12 +1,13 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://MainGame.cs" type="Script" id=1]
-[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Networking/NetworkHost.tscn" type="PackedScene" id=2]
 [ext_resource path="res://DebugCamera.cs" type="Script" id=3]
 [ext_resource path="res://Levels/TexturePacks/78 Hand Painted Textures by Deer Lover/Dirt_grass100%_009.png" type="Texture" id=4]
 [ext_resource path="res://Levels/TexturePacks/78 Hand Painted Textures by Deer Lover/Copper-Bricks.png" type="Texture" id=5]
 [ext_resource path="res://Player/Bot.tscn" type="PackedScene" id=6]
 [ext_resource path="res://FloatingText/FloatingText.tscn" type="PackedScene" id=7]
+[ext_resource path="res://MainMenu.tscn" type="PackedScene" id=8]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_texture = ExtResource( 4 )
@@ -37,12 +38,6 @@ polygon = PoolVector2Array( 19.8061, -63.3993, 2.46212, -61.6934, 2.88029, -30.3
 depth = 3.0
 material = SubResource( 2 )
 
-[node name="Player1" parent="." groups=[
-"tagged",
-"taggers",
-] instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
-
 [node name="DebugCamera" type="Camera" parent="."]
 transform = Transform( -0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, -12, 8, -13 )
 script = ExtResource( 3 )
@@ -58,3 +53,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.07968, 0, -27.5283 )
 
 [node name="FloatingText" parent="Position3D" instance=ExtResource( 7 )]
 text = "TEST!"
+
+[node name="NetworkHost" parent="." instance=ExtResource( 2 )]
+
+[node name="MainMenu" parent="." instance=ExtResource( 8 )]

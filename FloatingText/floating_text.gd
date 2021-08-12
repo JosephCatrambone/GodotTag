@@ -22,6 +22,9 @@ func _ready() -> void:
 
 
 func _process(_delta):
+	if not self.visible:
+		return
+		
 	if not camera.current:
 		# If the camera we have isn't the current one, get the current camera.
 		camera = get_viewport().get_camera()
